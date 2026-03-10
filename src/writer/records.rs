@@ -54,6 +54,7 @@ pub fn write_bag_header<W: Write>(
 }
 
 /// Write a connection record.
+#[allow(clippy::too_many_arguments)]
 pub fn write_connection<W: Write>(
     cursor: &mut WriteCursor<W>,
     conn_id: u32,

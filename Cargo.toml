@@ -17,10 +17,10 @@ byteorder = "1.1"
 bzip2 = "0.4.4"
 base16ct = "0.2"
 log = "0.4.4"
-lz4 = "1.23.2"
+lz4 = "1.25.0"
 memmap2 = "0.9"
 
 [dev-dependencies]
-roslibrust_serde_rosmsg = "0.5.1"
-serde = { version = "1.0", features = ["derive"] }
-tempfile = "3.26.0"
+roslibrust_serde_rosmsg = "0.6"
+serde = { version = "1.0.185", features = ["derive"] }
+tempfile = "3.10"

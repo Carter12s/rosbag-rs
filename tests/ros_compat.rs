@@ -3,8 +3,8 @@
 //! These tests generate bag files and validate them using the Python script
 //! which invokes official ROS tools (rosbag info, rosbag check, Python rosbag API).
 //!
-//! These tests are intended to run in a ROS1 Noetic environment (e.g., the CI container).
-//! They will be skipped if ROS is not available.
+//! These tests require a ROS1 Noetic environment and are marked with `#[ignore]`.
+//! Run them with `cargo test -- --ignored` in the ros-compat CI job.
 
 use rosbag::writer::{Compression, RosBagWriter, RosBagWriterBuilder};
 use serde::Serialize;
@@ -51,15 +51,6 @@ struct StdMsgsInt32 {
     data: i32,
 }
 
-/// Check if ROS is available in the environment
-fn ros_available() -> bool {
-    Command::new("rosbag")
-        .arg("--help")
-        .output()
-        .map(|o| o.status.success())
-        .unwrap_or(false)
-}
-
 /// Validate a bag file using the Python validation script.
 fn validate_bag(bag_path: &Path) -> Result<(), String> {
     let script_path = Path::new(env!("CARGO_MANIFEST_DIR"))
@@ -92,12 +83,8 @@ fn serialize_msg<T: Serialize>(msg: &T) -> Vec<u8> {
 }
 
 #[test]
+#[ignore] // Requires ROS environment - run with --ignored in ros-compat CI
 fn test_ros_compat_empty_bag() {
-    if !ros_available() {
-        eprintln!("Skipping test: ROS not available");
-        return;
-    }
-
     let temp_dir = TempDir::new().unwrap();
     let bag_path = temp_dir.path().join("empty.bag");
 
@@ -108,18 +95,21 @@ fn test_ros_compat_empty_bag() {
 }
 
 #[test]
+#[ignore] // Requires ROS environment - run with --ignored in ros-compat CI
 fn test_ros_compat_single_message() {
-    if !ros_available() {
-        eprintln!("Skipping test: ROS not available");
-        return;
-    }
-
     let temp_dir = TempDir::new().unwrap();
     let bag_path = temp_dir.path().join("single_message.bag");
 
     let mut writer = RosBagWriter::create(&bag_path).unwrap();
     let channel = writer
-        .register_connection("/chatter", "std_msgs/String", &STRING_MD5, "string data", "", false)
+        .register_connection(
+            "/chatter",
+            "std_msgs/String",
+            &STRING_MD5,
+            "string data",
+            "",
+            false,
+        )
         .unwrap();
 
     let msg = StdMsgsString {
@@ -134,18 +124,21 @@ fn test_ros_compat_single_message() {
 }
 
 #[test]
+#[ignore] // Requires ROS environment - run with --ignored in ros-compat CI
 fn test_ros_compat_multiple_messages() {
-    if !ros_available() {
-        eprintln!("Skipping test: ROS not available");
-        return;
-    }
-
     let temp_dir = TempDir::new().unwrap();
     let bag_path = temp_dir.path().join("multiple_messages.bag");
 
     let mut writer = RosBagWriter::create(&bag_path).unwrap();
     let channel = writer
-        .register_connection("/chatter", "std_msgs/String", &STRING_MD5, "string data", "", false)
+        .register_connection(
+            "/chatter",
+            "std_msgs/String",
+            &STRING_MD5,
+            "string data",
+            "",
+            false,
+        )
         .unwrap();
 
     for i in 0..100 {
@@ -163,21 +156,31 @@ fn test_ros_compat_multiple_messages() {
 }
 
 #[test]
+#[ignore] // Requires ROS environment - run with --ignored in ros-compat CI
 fn test_ros_compat_multiple_topics() {
-    if !ros_available() {
-        eprintln!("Skipping test: ROS not available");
-        return;
-    }
-
     let temp_dir = TempDir::new().unwrap();
     let bag_path = temp_dir.path().join("multiple_topics.bag");
 
     let mut writer = RosBagWriter::create(&bag_path).unwrap();
     let string_channel = writer
-        .register_connection("/chatter", "std_msgs/String", &STRING_MD5, "string data", "", false)
+        .register_connection(
+            "/chatter",
+            "std_msgs/String",
+            &STRING_MD5,
+            "string data",
+            "",
+            false,
+        )
         .unwrap();
     let int_channel = writer
-        .register_connection("/counter", "std_msgs/Int32", &INT32_MD5, "int32 data", "", false)
+        .register_connection(
+            "/counter",
+            "std_msgs/Int32",
+            &INT32_MD5,
+            "int32 data",
+            "",
+            false,
+        )
         .unwrap();
 
     for i in 0..50 {
@@ -199,12 +202,8 @@ fn test_ros_compat_multiple_topics() {
 }
 
 #[test]
+#[ignore] // Requires ROS environment - run with --ignored in ros-compat CI
 fn test_ros_compat_lz4_compression() {
-    if !ros_available() {
-        eprintln!("Skipping test: ROS not available");
-        return;
-    }
-
     let temp_dir = TempDir::new().unwrap();
     let bag_path = temp_dir.path().join("lz4_compressed.bag");
 
@@ -213,7 +212,14 @@ fn test_ros_compat_lz4_compression() {
         .create(&bag_path)
         .unwrap();
     let channel = writer
-        .register_connection("/chatter", "std_msgs/String", &STRING_MD5, "string data", "", false)
+        .register_connection(
+            "/chatter",
+            "std_msgs/String",
+            &STRING_MD5,
+            "string data",
+            "",
+            false,
+        )
         .unwrap();
 
     for i in 0..10 {
@@ -221,7 +227,11 @@ fn test_ros_compat_lz4_compression() {
             data: format!("LZ4 compressed message {}", i),
         };
         channel
-            .write(&mut writer, (i as u64 + 1) * 1_000_000_000, &serialize_msg(&msg))
+            .write(
+                &mut writer,
+                (i as u64 + 1) * 1_000_000_000,
+                &serialize_msg(&msg),
+            )
             .unwrap();
     }
     writer.finish().unwrap();
@@ -230,12 +240,8 @@ fn test_ros_compat_lz4_compression() {
 }
 
 #[test]
+#[ignore] // Requires ROS environment - run with --ignored in ros-compat CI
 fn test_ros_compat_bz2_compression() {
-    if !ros_available() {
-        eprintln!("Skipping test: ROS not available");
-        return;
-    }
-
     let temp_dir = TempDir::new().unwrap();
     let bag_path = temp_dir.path().join("bz2_compressed.bag");
 
@@ -244,7 +250,14 @@ fn test_ros_compat_bz2_compression() {
         .create(&bag_path)
         .unwrap();
     let channel = writer
-        .register_connection("/chatter", "std_msgs/String", &STRING_MD5, "string data", "", false)
+        .register_connection(
+            "/chatter",
+            "std_msgs/String",
+            &STRING_MD5,
+            "string data",
+            "",
+            false,
+        )
         .unwrap();
 
     for i in 0..10 {
@@ -252,7 +265,11 @@ fn test_ros_compat_bz2_compression() {
             data: format!("BZ2 compressed message {}", i),
         };
         channel
-            .write(&mut writer, (i as u64 + 1) * 1_000_000_000, &serialize_msg(&msg))
+            .write(
+                &mut writer,
+                (i as u64 + 1) * 1_000_000_000,
+                &serialize_msg(&msg),
+            )
             .unwrap();
     }
     writer.finish().unwrap();
@@ -261,12 +278,8 @@ fn test_ros_compat_bz2_compression() {
 }
 
 #[test]
+#[ignore] // Requires ROS environment - run with --ignored in ros-compat CI
 fn test_ros_compat_multiple_chunks() {
-    if !ros_available() {
-        eprintln!("Skipping test: ROS not available");
-        return;
-    }
-
     let temp_dir = TempDir::new().unwrap();
     let bag_path = temp_dir.path().join("multiple_chunks.bag");
 
@@ -275,7 +288,14 @@ fn test_ros_compat_multiple_chunks() {
         .create(&bag_path)
         .unwrap();
     let channel = writer
-        .register_connection("/chatter", "std_msgs/String", &STRING_MD5, "string data", "", false)
+        .register_connection(
+            "/chatter",
+            "std_msgs/String",
+            &STRING_MD5,
+            "string data",
+            "",
+            false,
+        )
         .unwrap();
 
     for i in 0..100 {
@@ -283,7 +303,11 @@ fn test_ros_compat_multiple_chunks() {
             data: format!("Chunk test message number {}", i),
         };
         channel
-            .write(&mut writer, (i as u64 + 1) * 100_000_000, &serialize_msg(&msg))
+            .write(
+                &mut writer,
+                (i as u64 + 1) * 100_000_000,
+                &serialize_msg(&msg),
+            )
             .unwrap();
     }
     writer.finish().unwrap();
