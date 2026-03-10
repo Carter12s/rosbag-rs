@@ -1,0 +1,27 @@
+{
+    "name": "rosbag-rs ROS1 Noetic Dev",
+    "image": "carter12s/roslibrust-ci-noetic:rust_1_90",
+    
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "rust-lang.rust-analyzer",
+                "ms-python.python",
+                "ms-vscode.cpptools",
+                "serayuzgur.crates",
+                "tamasfe.even-better-toml",
+                "augment.vscode-augment"
+            ],
+            "settings": {
+                "rust-analyzer.cargo.features": "all",
+                "rust-analyzer.checkOnSave.command": "clippy",
+                "terminal.integrated.defaultProfile.linux": "bash"
+            }
+        }
+    },
+    "mounts": [
+        "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+    ],
+    "workspaceFolder": "/workspace"
+}
+

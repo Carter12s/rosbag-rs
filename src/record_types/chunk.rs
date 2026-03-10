@@ -6,7 +6,7 @@ use crate::cursor::Cursor;
 use crate::msg_iter::MessageRecordsIterator;
 
 /// Compression options for `Chunk` data.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum Compression {
     /// Bzip2 compression.

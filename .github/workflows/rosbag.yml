@@ -74,3 +74,17 @@ jobs:
           override: true
       - run: cargo test
       - run: cargo test --all-features
+
+  ros-compat:
+    name: ROS1 Noetic Compatibility
+    runs-on: ubuntu-latest
+    container:
+      image: carter12s/roslibrust-ci-noetic:rust_1_90
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run all tests (including ROS compatibility)
+        run: |
+          source /opt/ros/noetic/setup.bash
+          cargo test --all-features
+        shell: bash
