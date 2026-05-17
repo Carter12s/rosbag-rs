@@ -1,6 +1,6 @@
 //! Write cursor for binary data output.
 
-use byteorder::{ByteOrder, WriteBytesExt, LE};
+use byteorder::{ByteOrder, LE, WriteBytesExt};
 use std::io::{self, Write};
 
 /// A cursor for writing binary data with little-endian encoding.

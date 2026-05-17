@@ -1,8 +1,8 @@
 //! High-level RosBag writer.
 
 use super::records::{
-    write_bag_header, write_chunk, write_chunk_info, write_connection, write_index_data,
-    write_message_data, ChunkInfoEntry, IndexDataEntry,
+    ChunkInfoEntry, IndexDataEntry, write_bag_header, write_chunk, write_chunk_info,
+    write_connection, write_index_data, write_message_data,
 };
 use super::{WriteCursor, WriteError};
 use crate::record_types::Compression;

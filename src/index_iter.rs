@@ -1,5 +1,5 @@
 use crate::record_types::{ChunkInfo, Connection, IndexData};
-use crate::{record::Record, Cursor, Error, Result};
+use crate::{Cursor, Error, Result, record::Record};
 
 /// Record types which can be stored in the chunk section.
 #[derive(Debug, Clone)]
