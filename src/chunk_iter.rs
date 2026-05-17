@@ -1,5 +1,5 @@
 use crate::record_types::{Chunk, IndexData};
-use crate::{record::Record, Cursor, Error, Result};
+use crate::{Cursor, Error, Result, record::Record};
 
 /// Record types which can be stored in the chunk section.
 #[derive(Debug, Clone)]
@@ -16,7 +16,7 @@ pub struct ChunkRecordsIterator<'a> {
     pub(crate) offset: u64,
 }
 
-impl<'a> ChunkRecordsIterator<'a> {
+impl ChunkRecordsIterator<'_> {
     /// Jump to the given position in the file.
     ///
     /// Be carefull to jump only to record beginnings (e.g. to position listed

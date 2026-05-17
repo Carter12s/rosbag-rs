@@ -1,7 +1,7 @@
 //! Iterators over content of `Chunk`
 use super::Result;
 use crate::record_types::{Connection, MessageData};
-use crate::{record::Record, Error};
+use crate::{Error, record::Record};
 
 use crate::cursor::Cursor;
 

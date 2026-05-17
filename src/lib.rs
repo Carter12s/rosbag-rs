@@ -1,6 +1,6 @@
-//! Utilities for efficient reading of ROS bag files.
+//! Utilities for efficient reading and writing of ROS bag files.
 //!
-//! # Example
+//! # Reading Example
 //! ```
 //! use rosbag::{ChunkRecord, MessageRecord, IndexRecord, RosBag};
 //!
@@ -50,6 +50,33 @@
 //! }
 //! # Ok(()) }
 //! ```
+//!
+//! # Writing Example
+//! ```no_run
+//! use rosbag::writer::RosBagWriter;
+//!
+//! # fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! let mut writer = RosBagWriter::create("output.bag")?;
+//!
+//! // Register a connection (topic) - returns a Channel handle
+//! let channel = writer.register_connection(
+//!     "/chatter",
+//!     "std_msgs/String",
+//!     &[0u8; 16], // md5sum
+//!     "string data",
+//!     "",    // caller_id
+//!     false, // latching
+//! )?;
+//!
+//! // Write messages using the channel
+//! let time_ns = 1_000_000_000u64; // 1 second in nanoseconds
+//! channel.write(&mut writer, time_ns, b"hello world")?;
+//!
+//! // Finalize the bag file
+//! writer.finish()?;
+//! # Ok(())
+//! # }
+//! ```
 #![warn(missing_docs, rust_2018_idioms)]
 
 use memmap2::Mmap;
@@ -68,6 +95,7 @@ mod chunk_iter;
 mod index_iter;
 mod msg_iter;
 pub mod record_types;
+pub mod writer;
 
 use cursor::Cursor;
 use field_iter::FieldIterator;

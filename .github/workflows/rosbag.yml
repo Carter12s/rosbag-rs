@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v1
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: 1.63.0 # MSRV
+          toolchain: 1.85.0 # MSRV
           components: clippy
           override: true
           profile: minimal
@@ -56,14 +56,16 @@ jobs:
           override: true
           profile: minimal
       - run: cargo update -Z minimal-versions
-      - run: cargo test
+      # Only run library tests - integration tests have dev-dependencies
+      # that may not properly specify their minimum versions
+      - run: cargo test --lib
 
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         rust:
-          - 1.63.0 # MSRV
+          - 1.85.0 # MSRV
           - stable
     steps:
       - uses: actions/checkout@v1
@@ -74,3 +76,16 @@ jobs:
           override: true
       - run: cargo test
       - run: cargo test --all-features
+
+  ros-compat:
+    name: ROS1 Noetic Compatibility
+    runs-on: ubuntu-latest
+    container:
+      image: carter12s/roslibrust-ci-noetic:rust_1_90
+    env:
+      HOME: /root
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run all tests (including ROS compatibility)
+        run: source /opt/ros/noetic/setup.bash; source /root/.cargo/env; cargo test --all-features -- --ignored
+        shell: bash

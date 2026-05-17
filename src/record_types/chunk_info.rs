@@ -64,7 +64,7 @@ impl<'a> RecordGen<'a> for ChunkInfo<'a> {
     }
 }
 
-impl<'a> HeaderGen<'a> for ChunkInfoHeader {
+impl HeaderGen<'_> for ChunkInfoHeader {
     const OP: u8 = 0x06;
 
     fn process_field(&mut self, name: &str, val: &[u8]) -> Result<()> {
@@ -95,7 +95,7 @@ pub struct ChunkInfoEntriesIterator<'a> {
     cursor: Cursor<'a>,
 }
 
-impl<'a> Iterator for ChunkInfoEntriesIterator<'a> {
+impl Iterator for ChunkInfoEntriesIterator<'_> {
     type Item = ChunkInfoEntry;
 
     fn next(&mut self) -> Option<ChunkInfoEntry> {

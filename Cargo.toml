@@ -4,8 +4,8 @@ version = "0.6.3"
 description = "Utilities for reading ROS bag files."
 authors = ["Artyom Pavlov <newpavlov@gmail.com>"]
 license = "MIT OR Apache-2.0"
-edition = "2021"
-rust-version = "1.63"
+edition = "2024"
+rust-version = "1.85"
 readme = "README.md"
 documentation = "https://docs.rs/rosbag"
 repository = "https://github.com/newpavlov/rosbag-rs"
@@ -17,5 +17,10 @@ byteorder = "1.1"
 bzip2 = "0.4.4"
 base16ct = "0.2"
 log = "0.4.4"
-lz4 = "1.23.2"
+lz4 = "1.25.0"
 memmap2 = "0.9"
+
+[dev-dependencies]
+roslibrust_serde_rosmsg = "0.6"
+serde = { version = "1.0.185", features = ["derive"] }
+tempfile = "3.10"
