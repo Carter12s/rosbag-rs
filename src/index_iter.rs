@@ -18,7 +18,7 @@ pub struct IndexRecordsIterator<'a> {
     pub(crate) offset: u64,
 }
 
-impl<'a> IndexRecordsIterator<'a> {
+impl IndexRecordsIterator<'_> {
     /// Jump to the given position in the file.
     ///
     /// Be carefull to jump only to record beginnings, as incorrect offset position

@@ -34,7 +34,7 @@ impl<'a> RecordGen<'a> for MessageData<'a> {
     }
 }
 
-impl<'a> HeaderGen<'a> for MessageDataHeader {
+impl HeaderGen<'_> for MessageDataHeader {
     const OP: u8 = 0x02;
 
     fn process_field(&mut self, name: &str, val: &[u8]) -> Result<()> {

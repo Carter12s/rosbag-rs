@@ -16,7 +16,7 @@ pub struct ChunkRecordsIterator<'a> {
     pub(crate) offset: u64,
 }
 
-impl<'a> ChunkRecordsIterator<'a> {
+impl ChunkRecordsIterator<'_> {
     /// Jump to the given position in the file.
     ///
     /// Be carefull to jump only to record beginnings (e.g. to position listed

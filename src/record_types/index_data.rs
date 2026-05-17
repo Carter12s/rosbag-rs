@@ -51,7 +51,7 @@ impl<'a> RecordGen<'a> for IndexData<'a> {
     }
 }
 
-impl<'a> HeaderGen<'a> for IndexDataHeader {
+impl HeaderGen<'_> for IndexDataHeader {
     const OP: u8 = 0x04;
 
     fn process_field(&mut self, name: &str, val: &[u8]) -> Result<()> {
@@ -79,7 +79,7 @@ pub struct IndexDataEntriesIterator<'a> {
     cursor: Cursor<'a>,
 }
 
-impl<'a> Iterator for IndexDataEntriesIterator<'a> {
+impl Iterator for IndexDataEntriesIterator<'_> {
     type Item = IndexDataEntry;
 
     fn next(&mut self) -> Option<IndexDataEntry> {

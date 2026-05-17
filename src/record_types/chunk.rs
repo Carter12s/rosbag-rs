@@ -53,7 +53,7 @@ pub struct Chunk<'a> {
     data: Cow<'a, [u8]>,
 }
 
-impl<'a> Chunk<'a> {
+impl Chunk<'_> {
     /// Get iterator over only messages
     pub fn messages(&self) -> MessageRecordsIterator<'_> {
         MessageRecordsIterator::new(&self.data)
@@ -80,7 +80,7 @@ impl<'a> RecordGen<'a> for Chunk<'a> {
     }
 }
 
-impl<'a> HeaderGen<'a> for ChunkHeader {
+impl HeaderGen<'_> for ChunkHeader {
     const OP: u8 = 0x05;
 
     fn process_field(&mut self, name: &str, val: &[u8]) -> Result<()> {
