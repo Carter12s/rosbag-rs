@@ -4,14 +4,16 @@ use super::records::{
     write_bag_header, write_chunk, write_chunk_info, write_connection, write_index_data,
     write_message_data, ChunkInfoEntry, IndexDataEntry,
 };
-use super::WriteCursor;
+use super::{WriteCursor, WriteError};
 use crate::record_types::Compression;
-use crate::{Error, Result};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufWriter, Seek, Write};
 use std::marker::PhantomData;
 use std::path::Path;
+
+/// A specialized Result type for ROS bag file writing.
+pub type Result<T> = std::result::Result<T, WriteError>;
 
 const VERSION_STRING: &[u8] = b"#ROSBAG V2.0\n";
 const DEFAULT_CHUNK_SIZE: usize = 768 * 1024; // 768 KB default chunk size
@@ -280,7 +282,7 @@ impl<W: Write + Seek> RosBagWriter<W> {
         latching: bool,
     ) -> Result<Channel<W>> {
         if self.finished {
-            return Err(Error::InvalidWriterState("writer has been finished"));
+            return Err(WriteError::InvalidWriterState("writer has been finished"));
         }
 
         let id = self.next_conn_id;
@@ -318,12 +320,12 @@ impl<W: Write + Seek> RosBagWriter<W> {
     /// This is an internal method used by [`Channel::write`].
     pub(crate) fn write_message(&mut self, conn_id: u32, time_ns: u64, data: &[u8]) -> Result<()> {
         if self.finished {
-            return Err(Error::InvalidWriterState("writer has been finished"));
+            return Err(WriteError::InvalidWriterState("writer has been finished"));
         }
 
         // Verify connection exists
         if !self.connections.iter().any(|c| c.id == conn_id) {
-            return Err(Error::UnknownConnectionId(conn_id));
+            return Err(WriteError::UnknownConnectionId(conn_id));
         }
 
         // Record offset before writing
@@ -441,11 +443,11 @@ impl<W: Write + Seek> RosBagWriter<W> {
                     .block_checksum(lz4::liblz4::BlockChecksum::NoBlockChecksum)
                     .checksum(lz4::liblz4::ContentChecksum::ChecksumEnabled)
                     .build(Vec::new())
-                    .map_err(|e| Error::Lz4CompressionError(e.to_string()))?;
+                    .map_err(|e| WriteError::Lz4CompressionError(e.to_string()))?;
                 std::io::copy(&mut std::io::Cursor::new(data), &mut encoder)
-                    .map_err(|e| Error::Lz4CompressionError(e.to_string()))?;
+                    .map_err(|e| WriteError::Lz4CompressionError(e.to_string()))?;
                 let (compressed, result) = encoder.finish();
-                result.map_err(|e| Error::Lz4CompressionError(e.to_string()))?;
+                result.map_err(|e| WriteError::Lz4CompressionError(e.to_string()))?;
                 Ok(compressed)
             }
             Compression::Bzip2 => {
@@ -453,10 +455,10 @@ impl<W: Write + Seek> RosBagWriter<W> {
                     bzip2::write::BzEncoder::new(Vec::new(), bzip2::Compression::default());
                 encoder
                     .write_all(data)
-                    .map_err(|e| Error::Bzip2CompressionError(e.to_string()))?;
+                    .map_err(|e| WriteError::Bzip2CompressionError(e.to_string()))?;
                 encoder
                     .finish()
-                    .map_err(|e| Error::Bzip2CompressionError(e.to_string()))
+                    .map_err(|e| WriteError::Bzip2CompressionError(e.to_string()))
             }
         }
     }
